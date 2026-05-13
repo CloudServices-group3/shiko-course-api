@@ -22,7 +22,7 @@ public class CoursesController : ControllerBase
     }
 
     [HttpGet("{id}")]
-    public async Task<IActionResult> GetById(int id)
+    public async Task<IActionResult> GetById(Guid id)  
     {
         var course = await _service.GetCourseByIdAsync(id);
         if (course is null) return NotFound();
