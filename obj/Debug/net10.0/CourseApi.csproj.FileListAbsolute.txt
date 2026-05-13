@@ -35,3 +35,4 @@ C:\Users\danaa\source\repos\CourseApi\CourseApi\obj\Debug\net10.0\CourseApi.pdb
 C:\Users\danaa\source\repos\CourseApi\CourseApi\obj\Debug\net10.0\CourseApi.genruntimeconfig.cache
 C:\Users\danaa\source\repos\CourseApi\CourseApi\obj\Debug\net10.0\ref\CourseApi.dll
 C:\Users\danaa\source\repos\CourseApi\CourseApi\obj\Debug\net10.0\staticwebassets.upToDateCheck.txt
+C:\Users\danaa\source\repos\CourseApi\CourseApi\obj\Debug\net10.0\CourseApi.sourcelink.json

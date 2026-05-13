@@ -27,9 +27,9 @@ public class CourseService : ICourseService
         });
     }
 
-    public async Task<CourseDto?> GetCourseByIdAsync(int id)
+    public async Task<CourseDto?> GetCourseByIdAsync(Guid id)
     {
-        var course = await _repository.GetByIdAsync(id);
+        var course = await _repository.GetByIdAsync(id);  
         if (course is null) return null;
 
         return new CourseDto
