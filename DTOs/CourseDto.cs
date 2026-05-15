@@ -8,4 +8,5 @@ public class CourseDto
     public int LessonCount { get; set; }
     public string Duration { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;
+    
 }
