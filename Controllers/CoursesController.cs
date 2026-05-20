@@ -17,22 +17,43 @@ public class CoursesController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
-        var courses = await _service.GetAllCoursesAsync();
-        return Ok(courses);
+        try
+        {
+            var courses = await _service.GetAllCoursesAsync();
+            return Ok(courses);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, ex.Message + " | " + ex.InnerException?.Message);
+        }
     }
 
     [HttpGet("{id}")]
-    public async Task<IActionResult> GetById(Guid id)  
+    public async Task<IActionResult> GetById(Guid id)
     {
-        var course = await _service.GetCourseByIdAsync(id);
-        if (course is null) return NotFound();
-        return Ok(course);
+        try
+        {
+            var course = await _service.GetCourseByIdAsync(id);
+            if (course is null) return NotFound();
+            return Ok(course);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, ex.Message + " | " + ex.InnerException?.Message);
+        }
     }
 
     [HttpGet("search")]
     public async Task<IActionResult> Search([FromQuery] string q)
     {
-        var results = await _service.SearchCoursesAsync(q);
-        return Ok(results);
+        try
+        {
+            var results = await _service.SearchCoursesAsync(q);
+            return Ok(results);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, ex.Message + " | " + ex.InnerException?.Message);
+        }
     }
 }
