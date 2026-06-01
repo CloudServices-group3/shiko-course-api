@@ -1,4 +1,4 @@
-﻿using CourseApi.DTOs;
+﻿using CourseApi.Contracts;
 using CourseApi.Models;
 using CourseApi.Repositories;
 
@@ -13,47 +13,86 @@ public class CourseService : ICourseService
         _repository = repository;
     }
 
-    public async Task<IEnumerable<CourseDto>> GetAllCoursesAsync()
+    public async Task<IEnumerable<CourseResponse>> GetAllCoursesAsync()
     {
         var courses = await _repository.GetAllAsync();
-        return courses.Select(c => new CourseDto
-        {
-            Id = c.Id,
-            Title = c.Title,
-            ImageUrl = c.ImageUrl,
-            LessonCount = c.LessonCount,
-            Duration = c.Duration,
-            Description = c.Description
-        });
+
+        return courses.Select(MapToResponse);
     }
 
-    public async Task<CourseDto?> GetCourseByIdAsync(Guid id)
+    public async Task<CourseResponse?> GetCourseByIdAsync(Guid id)
     {
         var course = await _repository.GetByIdAsync(id);
-        if (course is null) return null;
 
-        return new CourseDto
+        if (course is null)
+        {
+            return null;
+        }
+
+        return MapToResponse(course);
+    }
+
+    public async Task<IEnumerable<CourseResponse>> SearchCoursesAsync(string query)
+    {
+        var courses = await _repository.SearchAsync(query);
+
+        return courses.Select(MapToResponse);
+    }
+
+    public async Task<CourseResponse> CreateCourseAsync(CreateCourseRequest request)
+    {
+        var course = new Course
+        {
+            Id = Guid.NewGuid(),
+            Title = request.Title.Trim(),
+            ImageUrl = request.ImageUrl.Trim()
+        };
+
+        await _repository.AddAsync(course);
+        await _repository.SaveChangesAsync();
+
+        return MapToResponse(course);
+    }
+
+    public async Task<CourseResponse?> UpdateCourseAsync(Guid id, UpdateCourseRequest request)
+    {
+        var course = await _repository.GetByIdAsync(id);
+
+        if (course is null)
+        {
+            return null;
+        }
+
+        course.Title = request.Title.Trim();
+        course.ImageUrl = request.ImageUrl.Trim();
+
+        await _repository.SaveChangesAsync();
+
+        return MapToResponse(course);
+    }
+
+    public async Task<bool> DeleteCourseAsync(Guid id)
+    {
+        var course = await _repository.GetByIdAsync(id);
+
+        if (course is null)
+        {
+            return false;
+        }
+
+        _repository.Delete(course);
+        await _repository.SaveChangesAsync();
+
+        return true;
+    }
+
+    private static CourseResponse MapToResponse(Course course)
+    {
+        return new CourseResponse
         {
             Id = course.Id,
             Title = course.Title,
-            ImageUrl = course.ImageUrl,
-            LessonCount = course.LessonCount,
-            Duration = course.Duration,
-            Description = course.Description
+            ImageUrl = course.ImageUrl
         };
-    }
-
-    public async Task<IEnumerable<CourseDto>> SearchCoursesAsync(string query)
-    {
-        var courses = await _repository.SearchAsync(query);
-        return courses.Select(c => new CourseDto
-        {
-            Id = c.Id,
-            Title = c.Title,
-            ImageUrl = c.ImageUrl,
-            LessonCount = c.LessonCount,
-            Duration = c.Duration,
-            Description = c.Description
-        });
     }
 }

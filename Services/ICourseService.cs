@@ -1,10 +1,18 @@
-﻿using CourseApi.DTOs;
+﻿using CourseApi.Contracts;
 
 namespace CourseApi.Services;
 
 public interface ICourseService
 {
-    Task<IEnumerable<CourseDto>> GetAllCoursesAsync();
-    Task<CourseDto?> GetCourseByIdAsync(Guid id);
-    Task<IEnumerable<CourseDto>> SearchCoursesAsync(string query);
+    Task<IEnumerable<CourseResponse>> GetAllCoursesAsync();
+
+    Task<CourseResponse?> GetCourseByIdAsync(Guid id);
+
+    Task<IEnumerable<CourseResponse>> SearchCoursesAsync(string query);
+
+    Task<CourseResponse> CreateCourseAsync(CreateCourseRequest request);
+
+    Task<CourseResponse?> UpdateCourseAsync(Guid id, UpdateCourseRequest request);
+
+    Task<bool> DeleteCourseAsync(Guid id);
 }

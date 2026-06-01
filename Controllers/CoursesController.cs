@@ -1,59 +1,60 @@
-﻿using CourseApi.Services;
+﻿using CourseApi.Contracts;
+using CourseApi.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CourseApi.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
-public class CoursesController : ControllerBase
+[Route("api/courses")]
+[Authorize]
+public sealed class CoursesController(ICourseService courseService) : ControllerBase
 {
-    private readonly ICourseService _service;
-
-    public CoursesController(ICourseService service)
-    {
-        _service = service;
-    }
-
     [HttpGet]
-    public async Task<IActionResult> GetAll()
+    [ProducesResponseType<IEnumerable<CourseResponse>>(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<ActionResult<IEnumerable<CourseResponse>>> GetCourses()
     {
-        try
-        {
-            var courses = await _service.GetAllCoursesAsync();
-            return Ok(courses);
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, ex.Message + " | " + ex.InnerException?.Message);
-        }
+        var courses = await courseService.GetAllCoursesAsync();
+
+        return Ok(courses);
     }
 
-    [HttpGet("{id}")]
-    public async Task<IActionResult> GetById(Guid id)
+    [HttpGet("{id:guid}")]
+    [ProducesResponseType<CourseResponse>(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<CourseResponse>> GetCourseById(Guid id)
     {
-        try
+        if (id == Guid.Empty)
         {
-            var course = await _service.GetCourseByIdAsync(id);
-            if (course is null) return NotFound();
-            return Ok(course);
+            return BadRequest("Course id cannot be empty.");
         }
-        catch (Exception ex)
+
+        var course = await courseService.GetCourseByIdAsync(id);
+
+        if (course is null)
         {
-            return StatusCode(500, ex.Message + " | " + ex.InnerException?.Message);
+            return NotFound();
         }
+
+        return Ok(course);
     }
 
     [HttpGet("search")]
-    public async Task<IActionResult> Search([FromQuery] string q)
+    [ProducesResponseType<IEnumerable<CourseResponse>>(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<ActionResult<IEnumerable<CourseResponse>>> SearchCourses([FromQuery] string? q)
     {
-        try
+        if (string.IsNullOrWhiteSpace(q))
         {
-            var results = await _service.SearchCoursesAsync(q);
-            return Ok(results);
+            return BadRequest("Search query is required.");
         }
-        catch (Exception ex)
-        {
-            return StatusCode(500, ex.Message + " | " + ex.InnerException?.Message);
-        }
+
+        var courses = await courseService.SearchCoursesAsync(q);
+
+        return Ok(courses);
     }
 }

@@ -1,6 +1,6 @@
-﻿namespace CourseApi.Models;
+namespace CourseApi.Contracts;
 
-public class Course
+public class CourseResponse
 {
     public Guid Id { get; set; }
 

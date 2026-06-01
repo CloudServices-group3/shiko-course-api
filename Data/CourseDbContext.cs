@@ -3,14 +3,13 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CourseApi.Data;
 
-public class CourseDbContext : DbContext
+public sealed class CourseDbContext(DbContextOptions<CourseDbContext> options)
+    : DbContext(options)
 {
-    public CourseDbContext(DbContextOptions<CourseDbContext> options) : base(options) { }
-
-    public DbSet<Course> Courses { get; set; }
+    public DbSet<Course> Courses => Set<Course>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        
+        modelBuilder.ApplyConfigurationsFromAssembly(typeof(CourseDbContext).Assembly);
     }
 }
