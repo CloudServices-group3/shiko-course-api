@@ -2,6 +2,8 @@ using CourseApi.Data;
 using CourseApi.Models;
 using CourseApi.Repositories;
 using CourseApi.Services;
+using CourseApi.OpenApi;
+using Scalar.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -10,6 +12,12 @@ using System.Text;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
+
+builder.Services.AddOpenApi(options =>
+{
+    options.AddDocumentTransformer<BearerSecuritySchemeTransformer>();
+    options.AddOperationTransformer<AuthOperationTransformer>();
+});
 
 var jwtIssuer = builder.Configuration["Jwt:Issuer"];
 var jwtAudience = builder.Configuration["Jwt:Audience"];
@@ -84,6 +92,13 @@ builder.Services.AddCors(options =>
 });
 
 var app = builder.Build();
+
+app.MapOpenApi();
+
+app.MapScalarApiReference(options =>
+{
+    options.WithTitle("Shiko Course Provider API");
+});
 
 using (var scope = app.Services.CreateScope())
 {
